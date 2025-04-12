@@ -6,23 +6,49 @@ import AdminDashboard from './pages/Dashboard/AdminDashboard'
 import UserDashboard from './pages/Dashboard/UserDashboard'
 import OwnerDashboard from './pages/Dashboard/OwnerDashboard'
 import NavBar from './components/NavBar'
+import Protected from './components/Protected'
 
 function App() {
-  
+
 
   return (
     <>
       {/* <LoginPage/> */}
-    
+
       <BrowserRouter>
-      
-      <Routes>
-        <Route path='/' element={<LoginPage/>} />
-        <Route path='/signup' element={<SignupPage/>}/>
-        <Route path='/admin-dashboard' element={<AdminDashboard/>}/>
-        <Route path='/user-dashboard' element={<UserDashboard/>}/>
-        <Route path='/owner-dashboard' element={<OwnerDashboard/>} />
-      </Routes>
+
+        <Routes>
+          <Route path='/' element={<LoginPage />} />
+          <Route path='/signup' element={<SignupPage />} />
+          <Route
+            path='/admin-dashboard'
+            element={
+              <Protected>
+                  <AdminDashboard />
+              </Protected>
+            }
+          />
+          <Route
+            path='/user-dashboard'
+            element={
+              <Protected>
+                <UserDashboard/>
+              </Protected>
+            
+          
+          }
+          />
+          <Route
+            path='/owner-dashboard'
+            element={
+              <Protected>
+                <OwnerDashboard/>
+              </Protected>
+            
+          }
+          />
+
+        </Routes>
       </BrowserRouter>
     </>
   )

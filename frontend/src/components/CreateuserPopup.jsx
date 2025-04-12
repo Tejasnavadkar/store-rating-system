@@ -1,5 +1,8 @@
+import axios from "axios";
 import { useState } from "react";
 import { RxCross1 } from "react-icons/rx";
+import { useNavigate } from "react-router-dom";
+import { emailRegex, passwordRegex } from "../config";
 
 const CreateUser = ({setCreateBoxOpen}) => {
 
@@ -10,15 +13,54 @@ const CreateUser = ({setCreateBoxOpen}) => {
         role: "",
         address: ""
     });
+    const [validationErrors,setValidationErrors] = useState({})
+    const navigate = useNavigate()
+
+    // validate inputs
+     const InputValidation = () =>{
+          
+        if(data.name.length < 20 || data.name.length > 60 ){
+            setValidationErrors((prev)=>({...prev,name:'name should min 20 & max 60 character'}))
+        }
+          
+            if(!emailRegex.test(data.email)){
+                setValidationErrors((prev)=>({...prev,email:'Enter Valid Email'}))
+            }
+            if(!passwordRegex.test(data.password)){
+                setValidationErrors((prev)=>({...prev,password:`
+                     8–16 characters
+                     At least one uppercase letter
+                     At least one special character
+                    `}))
+            }
+            if(data.address.trim().length > 400){
+                setValidationErrors((prev)=>({...prev,address:`max 400 charaters`}))
+            }
+        }
 
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Login form submitted:", data);
-        // Handle API call here
+        console.log("data:", data);
+       
+        InputValidation()
+        if(validationErrors !== null) return
+
+        try {
+             // API call 
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`, data)
+            if (response.status === 201) {
+               alert('user created succefully')
+               navigate('/admin-dashboard')
+            }
+    
+            } catch (error) {
+                alert(error.message)
+                throw new Error('err create user/admin -',error)
+            }
     };
 
     return (
@@ -41,6 +83,7 @@ const CreateUser = ({setCreateBoxOpen}) => {
                                 className="w-full border border-gray-950 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter name"
                             />
+                            {validationErrors.name && <span className="text-sm text-red-600">{validationErrors.name}</span>}
                         </div>
                         <div>
                             <label className="block mb-1 font-medium text-gray-950">
@@ -55,6 +98,7 @@ const CreateUser = ({setCreateBoxOpen}) => {
                                 className="w-full border border-gray-950 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="you@example.com"
                             />
+                            {validationErrors.email && <span className="text-sm text-red-600">{validationErrors.email}</span>}
                         </div>
                         <div>
                             <label className="block mb-1 font-medium text-gray-950">
@@ -69,6 +113,7 @@ const CreateUser = ({setCreateBoxOpen}) => {
                                 className="w-full border border-gray-950 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="••••••••"
                             />
+                            {validationErrors.password && <span className="text-sm text-red-600">{validationErrors.password}</span>}
                         </div>
 
                         <div>
@@ -83,7 +128,7 @@ const CreateUser = ({setCreateBoxOpen}) => {
                                 className="w-full border border-gray-950 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter address"
                             ></textarea>
-
+                            {validationErrors.address && <span className="text-sm text-red-600">{validationErrors.address}</span>}
                         </div>
 
                         <div>

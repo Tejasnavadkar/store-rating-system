@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import axios from 'axios';
+import React, {useEffect, useState } from 'react'
+import { useStore } from '../Context/Context';
 
 const UsersTable = () => {
+
     const [users, setUsers] = useState([
         {
             name: "Tejas Patil",
@@ -21,9 +24,39 @@ const UsersTable = () => {
             role: "Store Owner",
         },
     ]);
-
     const [sortField, setSortField] = useState('')
     const [sortOrder, setSortOrder] = useState('')
+    const [filter,setFilter] = useState('')
+
+    const {setTotalUser,setTotalUsersSubmittedRating} = useStore()
+
+
+    const FetchUsers = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/getAllUsers`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                params: {
+                    filter: filter  // to search
+                }
+            });
+            if (response.status === 201) {
+                const AllUsers = [...response.data.user]
+                setUsers(response.data.user);
+                setTotalUser(response.data.user.length)
+               const onlyRatedUsers = AllUsers.filter((user)=> user.ratings.length > 0) // users who submit ratings
+               setTotalUsersSubmittedRating(onlyRatedUsers.length)
+            }
+        } catch (error) {
+            console.log('err', error);
+            throw new Error('err in usersTable -', error);
+        }
+    }
+
+    useEffect(() => {
+        FetchUsers();
+    }, [filter]);
 
 
     // sorting based on fields 
@@ -38,7 +71,7 @@ const UsersTable = () => {
                 setUsers(sortedData);
             }
         }
-    }, [sortField, sortOrder, users]);
+    }, [sortField, sortOrder]);
 
     useEffect(() => {
         HandleSort();
@@ -53,7 +86,7 @@ const UsersTable = () => {
                     <div className='w-2xl'>
                         <input
                             type="text"
-                            name=""
+                            onChange={(e)=>setFilter(e.target.value)}
                             placeholder='Search by name,email,address'
                             className='border py-1 px-1 w-full'
                         />

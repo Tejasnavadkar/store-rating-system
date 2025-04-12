@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios'
+import { useStore } from "../Context/Context";
+import { emailRegex, passwordRegex } from "../config";
 
 const SignUp = () => {
     const [signupInfo, setsignUpInfo] = useState({
@@ -9,15 +12,77 @@ const SignUp = () => {
         role: "",
         address: ""
     });
+    const [validationErrors,setValidationErrors] = useState({})
+    const navigate = useNavigate()
+    const {setCurrentUser} = useStore()
+
+
+    const InputValidation = () =>{
+
+        if(signupInfo.name.length < 20 || signupInfo.name.length > 60 ){
+            setValidationErrors((prev)=>({...prev,name:'name should min 20 & max 60 character'}))
+        }
+
+        if(!emailRegex.test(signupInfo.email)){
+            setValidationErrors((prev)=>({...prev,email:'Enter Valid Email'}))
+        }
+        if(!passwordRegex.test(signupInfo.password)){
+            setValidationErrors((prev)=>({...prev,password:`
+                 8–16 characters
+                 At least one uppercase letter
+                 At least one special character
+                `}))
+        }
+        if(signupInfo.address.trim().length > 400){
+            setValidationErrors((prev)=>({...prev,address:`max 400 charaters`}))
+        }
+    }
 
     const handleChange = (e) => {
         setsignUpInfo({ ...signupInfo, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Login form submitted:", signupInfo);
-        // Handle API call here
+        // input validations 
+         InputValidation()
+        if(validationErrors !== null) return
+
+        try {
+            // API call
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`, signupInfo)
+        if (response.status === 201) {
+
+            console.log('signupResponse-', response.data)
+
+            setCurrentUser(response.data.user)  // store in context
+            localStorage.setItem('user', JSON.stringify(response.data.token))
+            localStorage.setItem('token', JSON.stringify(response.data.user))
+            localStorage.setItem('role', JSON.stringify(response.data.user.role))
+        }
+
+        switch (response.data.user.role) {  // role based navigation
+            case "USER":
+                navigate('/user-dashboard')
+                break;
+
+            case "ADMIN":
+                navigate('/admin-dashboard')
+                break;
+
+            case "OWNER":
+                navigate('/owner-dashboard')
+                break;
+
+            default:
+                break;
+        }
+
+        } catch (error) {
+            console.log('err',error)
+            throw new Error('err in signup api -',error)
+        }
     };
 
     return (
@@ -38,6 +103,7 @@ const SignUp = () => {
                             className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter name"
                         />
+                        {validationErrors.name && <span className="text-sm text-red-600">{validationErrors.name}</span>}
                     </div>
                     <div>
                         <label className="block mb-1 font-medium text-gray-700">
@@ -52,6 +118,7 @@ const SignUp = () => {
                             className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="you@example.com"
                         />
+                        {validationErrors.email && <span className="text-sm text-red-600">{validationErrors.email}</span>}
                     </div>
                     <div>
                         <label className="block mb-1 font-medium text-gray-700">
@@ -66,6 +133,7 @@ const SignUp = () => {
                             className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="••••••••"
                         />
+                          {validationErrors.password && <span className="text-sm text-red-600">{validationErrors.password}</span>}
                     </div>
 
                     <div>
@@ -80,6 +148,7 @@ const SignUp = () => {
                             className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter address"
                         ></textarea>
+                        {validationErrors.address && <span className="text-sm text-red-600">{validationErrors.address}</span>}
 
                     </div>
 

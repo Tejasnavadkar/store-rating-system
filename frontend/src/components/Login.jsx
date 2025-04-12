@@ -1,17 +1,55 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useStore } from "../Context/Context";
 
 const Login = () => {
   const [loginInfo, setLogInfo] = useState({ email: "", password: "" });
+  const navigate =  useNavigate()
+
+  const {setCurrentUser} = useStore()
 
   const handleChange = (e) => {
     setLogInfo({ ...loginInfo, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Login form submitted:", loginInfo);
     // Handle API call here
+     try {
+                
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, loginInfo)
+            if (response.status === 201) {
+                console.log('signupResponse-', response.data)
+
+                setCurrentUser(response.data.user)  // store in context
+                localStorage.setItem('user', JSON.stringify(response.data.token))
+                localStorage.setItem('token', JSON.stringify(response.data.user))
+                localStorage.setItem('role', JSON.stringify(response.data.user.role))
+            }
+    
+            switch (response.data.user.role) {  // role based navigation
+                case "USER":
+                    navigate('/user-dashboard')
+                    break;
+    
+                case "ADMIN":
+                    navigate('/admin-dashboard')
+                    break;
+    
+                case "OWNER":
+                    navigate('/owner-dashboard')
+                    break;
+    
+                default:
+                    break;
+            }
+    
+            } catch (error) {
+                console.log('err',error)
+                throw new Error('err in login api -',error)
+            }
   };
 
   return (
