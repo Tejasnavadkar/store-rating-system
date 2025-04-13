@@ -5,26 +5,7 @@ import axios from 'axios';
 
 const User = () => {
 
-    const [stores,setStores] = useState([
-        {
-            id: 1,
-            name: "Smart Electronics",
-            address: "MG Road, Pune",
-            overallRating: 4.3,
-        },
-        {
-            id: 2,
-            name: "Daily Needs Mart",
-            address: "Koregaon Park, Pune",
-            overallRating: 3.8,
-        },
-        {
-            id: 3,
-            name: "Gadget World",
-            address: "Viman Nagar, Pune",
-            overallRating: 4.7,
-        },
-    ]);
+    const [stores,setStores] = useState([]);
     const [filter,setFilter] = useState('')
     const [ratings, setRatings] = useState({});
 
