@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
         })
     }
 
-    console.log('creteduser-',createdUser)
+    // console.log('creteduser-',createdUser)
     const jwtPayload = {
         id: createdUser.id,
         email: createdUser.email

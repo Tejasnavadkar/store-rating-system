@@ -34,8 +34,10 @@ const getUser = async (req, res) => {
 }
 
 const getAllUsers = async (req, res) => {
+    console.log('hii')
 
     const filter = req.query.filter || ""
+    console.log('filter--',filter)
     try {
 
 
@@ -87,10 +89,7 @@ const getAllUsers = async (req, res) => {
 
 
     } catch (error) {
-        return res.status(500).json({
-            message: 'Error getting users',
-            error: error.message
-        })
+       throw new Error('err in getAllusers controllers--',error)
     }
 
 }

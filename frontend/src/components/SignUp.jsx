@@ -59,8 +59,8 @@ const SignUp = () => {
             console.log('signupResponse-', response.data)
 
             setCurrentUser(response.data.user)  // store in context
-            localStorage.setItem('user', JSON.stringify(response.data.token))
-            localStorage.setItem('token', JSON.stringify(response.data.user))
+            localStorage.setItem('user', JSON.stringify(response.data.user))
+            localStorage.setItem('token', response.data.token)
             localStorage.setItem('role', JSON.stringify(response.data.user.role))
         }
 

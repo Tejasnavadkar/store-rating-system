@@ -5,24 +5,7 @@ import { useStore } from '../Context/Context';
 const UsersTable = () => {
 
     const [users, setUsers] = useState([
-        {
-            name: "Tejas Patil",
-            email: "tejas@example.com",
-            address: "Pune, Maharashtra",
-            role: "Admin",
-        },
-        {
-            name: "Aryan Mehta",
-            email: "aryan@gmail.com",
-            address: "Mumbai, Maharashtra",
-            role: "User",
-        },
-        {
-            name: "Priya Sharma",
-            email: "priya@yahoo.com",
-            address: "Delhi, India",
-            role: "Store Owner",
-        },
+    
     ]);
     const [sortField, setSortField] = useState('')
     const [sortOrder, setSortOrder] = useState('')
@@ -41,6 +24,7 @@ const UsersTable = () => {
                     filter: filter  // to search
                 }
             });
+            console.log('FetchUser response',response)
             if (response.status === 201) {
                 const AllUsers = [...response.data.user]
                 setUsers(response.data.user);
@@ -49,7 +33,7 @@ const UsersTable = () => {
                setTotalUsersSubmittedRating(onlyRatedUsers.length)
             }
         } catch (error) {
-            console.log('err', error);
+            console.log('err-fetch users', error);
             throw new Error('err in usersTable -', error);
         }
     }
@@ -143,3 +127,23 @@ const UsersTable = () => {
 }
 
 export default UsersTable
+
+
+// {
+//     name: "Tejas Patil",
+//     email: "tejas@example.com",
+//     address: "Pune, Maharashtra",
+//     role: "Admin",
+// },
+// {
+//     name: "Aryan Mehta",
+//     email: "aryan@gmail.com",
+//     address: "Mumbai, Maharashtra",
+//     role: "User",
+// },
+// {
+//     name: "Priya Sharma",
+//     email: "priya@yahoo.com",
+//     address: "Delhi, India",
+//     role: "Store Owner",
+// },

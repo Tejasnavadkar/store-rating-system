@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 export const generateToken = (jwtPayload) => {
     
     try {
-        console.log('jwtPayload',jwtPayload)
+        // console.log('jwtPayload',jwtPayload)
         if (!process.env.JWT_SECRET) {
             throw new Error("JWT_SECRET is not defined");
         }
