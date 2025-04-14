@@ -19,6 +19,8 @@ const SignUp = () => {
 
     const InputValidation = () =>{
 
+        setValidationErrors({})
+
         if(signupInfo.name.length < 20 || signupInfo.name.length > 60 ){
             setValidationErrors((prev)=>({...prev,name:'name should min 20 & max 60 character'}))
         }
@@ -47,8 +49,8 @@ const SignUp = () => {
         console.log("Login form submitted:", signupInfo);
         // input validations 
          InputValidation()
-        if(validationErrors !== null) return
-
+        if(Object.keys(validationErrors).length > 0) return
+        console.log('signup')
         try {
             // API call
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/signup`, signupInfo)

@@ -31,7 +31,7 @@ const StoresTable = () => {
 
     const FetchStore = useCallback(async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/user/getAllUsers`, {
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/store/getAllstores`,{
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
