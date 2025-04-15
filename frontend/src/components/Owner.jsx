@@ -15,7 +15,7 @@ const Owner = () => {
     // ])
 
     const [owner, setOwner] = useState({})
-  
+
 
 
     const FetchStore = async () => {
@@ -47,9 +47,9 @@ const Owner = () => {
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         FetchStore()
-    },[])
+    }, [])
 
 
     return (
@@ -65,8 +65,8 @@ const Owner = () => {
 
                         <div>
                             <span className='font-bold '>Name:</span>
-                           <span>{owner?.stores?.[0]?.name || 'N/A'}</span>
-                        </div>  
+                            <span>{owner?.stores?.[0]?.name || 'N/A'}</span>
+                        </div>
 
                         <div>
                             <span className='font-bold '>Email:</span>
@@ -79,7 +79,7 @@ const Owner = () => {
                         </div>
                         <div>
                             <span className='font-bold '>Average Rating:</span>
-                            <span className=' '>{owner?.stores?.[0]?.overAllRating || 'N/A' }</span>
+                            <span className=' '>{owner?.stores?.[0]?.overAllRating || 'N/A'}</span>
                         </div>
                     </div>
 
@@ -100,13 +100,18 @@ const Owner = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {owner?.stores?.[0].ratings?.map((store) => (
-                                    <tr key={store?.id} className="border-t border-gray-300 hover:bg-gray-50">
-                                        <td className="px-4 py-2">{store?.user.name}</td>
-                                        <td className="px-4 py-2">{store?.value}</td>
-
+                                {owner?.stores?.[0]?.ratings && owner.stores[0].ratings.length > 0 ? (
+                                    owner.stores[0].ratings.map((store) => (
+                                        <tr key={store?.id} className="border-t border-gray-300 hover:bg-gray-50">
+                                            <td className="px-4 py-2">{store?.user?.name}</td>
+                                            <td className="px-4 py-2">{store?.value}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="2" className="px-4 py-2 text-center">No ratings available</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>

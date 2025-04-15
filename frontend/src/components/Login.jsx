@@ -24,27 +24,29 @@ const Login = () => {
                 console.log('signupResponse-', response.data)
 
                 setCurrentUser(response.data.user)  // store in context
-                localStorage.setItem('user', JSON.stringify(response.data.token))
-                localStorage.setItem('token', JSON.stringify(response.data.user))
+                localStorage.setItem('user', JSON.stringify(response.data.user))
+                localStorage.setItem('token', response.data.token)
                 localStorage.setItem('role', JSON.stringify(response.data.user.role))
+                
+                switch (response.data.user.role) {  // role based navigation
+                  case "USER":
+                      navigate('/user-dashboard')
+                      break;
+      
+                  case "ADMIN":
+                      navigate('/admin-dashboard')
+                      break;
+      
+                  case "OWNER":
+                      navigate('/owner-dashboard')
+                      break;
+      
+                  default:
+                      break;
+              }
             }
     
-            switch (response.data.user.role) {  // role based navigation
-                case "USER":
-                    navigate('/user-dashboard')
-                    break;
-    
-                case "ADMIN":
-                    navigate('/admin-dashboard')
-                    break;
-    
-                case "OWNER":
-                    navigate('/owner-dashboard')
-                    break;
-    
-                default:
-                    break;
-            }
+            
     
             } catch (error) {
                 console.log('err',error)

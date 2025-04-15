@@ -10,7 +10,7 @@ const StoresTable = () => {
     const [sortOrder, setSortOrder] = useState('')
     const [filter, setFilter] = useState('')
 
-    const {setTotalStore} = useStore()
+    const { setTotalStore } = useStore()
 
     // sorting based on fields 
     const HandleSort = useCallback(() => {
@@ -31,7 +31,7 @@ const StoresTable = () => {
 
     const FetchStore = useCallback(async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/store/getAllstores`,{
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/store/getAllstores`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
@@ -67,7 +67,7 @@ const StoresTable = () => {
                         <input
                             type="text"
                             name=""
-                            onChange={(e)=>setFilter(e.target.value)}
+                            onChange={(e) => setFilter(e.target.value)}
                             placeholder='Search by name,email,address'
                             className='border py-1 px-1 w-full'
                         />
@@ -108,10 +108,20 @@ const StoresTable = () => {
                             <tbody>
                                 {stores.map((user, idx) => (
                                     <tr key={idx} className="border-t border-gray-300 hover:bg-gray-50">
-                                        <td className="px-4 py-2">{user.name}</td>
-                                        <td className="px-4 py-2">{user.email}</td>
-                                        <td className="px-4 py-2">{user.address}</td>
-                                        <td className="px-4 py-2">{user.ratings}</td>
+                                        <td className="px-4 py-2">{user?.name}</td>
+                                        <td className="px-4 py-2">{user?.email}</td>
+                                        <td className="px-4 py-2">{user?.address}</td>
+                                        {/* <td className="px-4 py-2">{user?.ratings.reduce((item,acc)=>{
+                                            return (item.value + acc,0)/user.ratings.length
+                                        })}</td> */}
+                                        <td className="px-4 py-2">
+                                            {Array.isArray(user?.ratings)
+                                                ? user.ratings.length > 0
+                                                    ? (user.ratings.reduce((acc, rating) => acc + rating.value, 0) / user.ratings.length).toFixed()
+                                                    : '0'
+                                                : '0'
+                                            }
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -125,7 +135,7 @@ const StoresTable = () => {
 
 export default StoresTable
 
-// dummy data 
+// dummy data
 // const [stores, setStores] = useState([
 //     {
 //         name: "Arjun patil",

@@ -29,10 +29,10 @@ try {
 const createStoreWithOwner = async (req,res) => {
 try {
     
-    const {name,email,address,password,ownerName,ownerEmail,ownerPassword,ownerAddress} = req.body
+    const {StoreName,StoreEmail,StoreAddress,StorePassword,OwnerName,OwnerEmail,OwnerPassword,OwnerAddress} = req.body
 
-    if (!name || !email || !address || !password || 
-       !ownerName || !ownerEmail || !ownerAddress || !ownerPassword) {
+    if (!StoreName || !StoreEmail || !StoreAddress || !StorePassword || 
+       !OwnerName || !OwnerEmail || !OwnerPassword || !OwnerAddress) {
        return res.status(400).json({
            message: 'All fields are required'
        });
@@ -41,7 +41,7 @@ try {
     //check if store already exist
    const existingStore = await prisma.store.findUnique({
     where:{
-        email:email
+        email:StoreEmail
     }
    })
    
@@ -54,7 +54,7 @@ try {
    //check if owner already exist
    const existingOwner = await prisma.store.findUnique({
     where:{
-        email:ownerEmail
+        email:OwnerEmail
     }
    })
    
@@ -64,17 +64,17 @@ try {
        })
    }
 
-   const hashedStorePassword = await HashPassword(password)
-   const hashedOwnerPassword = await HashPassword(ownerPassword)
+   const hashedStorePassword = await HashPassword(StorePassword)
+   const hashedOwnerPassword = await HashPassword(OwnerPassword)
 
    const storeData = {
-       name,
-       email,
-       address,
+       name:StoreName,
+       email:StoreEmail,
+       address:StoreAddress,
        password: hashedStorePassword,
-       ownerName,
-       ownerEmail,
-       ownerAddress,
+       ownerName:OwnerName,
+       ownerEmail:OwnerEmail,
+       ownerAddress:OwnerAddress,
        ownerPassword: hashedOwnerPassword
    };
 
@@ -246,7 +246,7 @@ const modifyRating = async (req,res) => {
             }
         });
 
-        return res.status(200).json({
+        return res.status(201).json({
             message: 'Rating modified successfully',
             rating: updatedRating,
             storeNewRating: averageRating

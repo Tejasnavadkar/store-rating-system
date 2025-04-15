@@ -14,7 +14,7 @@ const CreateStore = ({ setCreateStorePopUp }) => {
         let errors = {};
 
         // Store validations
-        if (!data.StoreName || data.StoreName.length < 20 || data.StoreName.length > 60) {
+        if (!data.StoreName || data.StoreName.length < 3 || data.StoreName.length > 60) {
             errors.StoreName = 'Store name should be between 3 and 60 characters';
         }
 
@@ -34,7 +34,7 @@ const CreateStore = ({ setCreateStorePopUp }) => {
         }
 
         // Owner validations
-        if (!data.OwnerName || data.OwnerName.length < 20 || data.OwnerName.length > 60) {
+        if (!data.OwnerName || data.OwnerName.length < 3 || data.OwnerName.length > 60) {
             errors.OwnerName = 'Owner name should be between 3 and 60 characters';
         }
 
@@ -74,7 +74,11 @@ const CreateStore = ({ setCreateStorePopUp }) => {
         try {
 
             // api call 
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/store/addStore`, data)
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/store/addStore`, data,{
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem('token')}`
+                }
+            })
             if (response.status === 201) {
                 alert('store created succefully')
                 navigate('/admin-dashboard')

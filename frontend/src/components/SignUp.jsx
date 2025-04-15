@@ -9,7 +9,7 @@ const SignUp = () => {
         name: "",
         email: "",
         password: "",
-        role: "",
+        role: "USER",
         address: ""
     });
     const [validationErrors,setValidationErrors] = useState({})
@@ -62,24 +62,26 @@ const SignUp = () => {
             localStorage.setItem('user', JSON.stringify(response.data.user))
             localStorage.setItem('token', response.data.token)
             localStorage.setItem('role', JSON.stringify(response.data.user.role))
+
+            switch (response.data.user.role) {  // role based navigation
+                case "USER":
+                    navigate('/user-dashboard')
+                    break;
+    
+                case "ADMIN":
+                    navigate('/admin-dashboard')
+                    break;
+    
+                case "OWNER":
+                    navigate('/owner-dashboard')
+                    break;
+    
+                default:
+                    break;
+            }
         }
 
-        switch (response.data.user.role) {  // role based navigation
-            case "USER":
-                navigate('/user-dashboard')
-                break;
-
-            case "ADMIN":
-                navigate('/admin-dashboard')
-                break;
-
-            case "OWNER":
-                navigate('/owner-dashboard')
-                break;
-
-            default:
-                break;
-        }
+       
 
         } catch (error) {
             console.log('err',error)
@@ -155,7 +157,7 @@ const SignUp = () => {
                     </div>
 
                     <div>
-                        <select onChange={handleChange} name="role" id="" className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select onChange={handleChange} name="role" value={signupInfo.role} className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="USER">User</option>
                             <option value="OWNER">Owner</option>
                             <option value="ADMIN">Admin</option>

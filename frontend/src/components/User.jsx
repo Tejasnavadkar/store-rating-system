@@ -12,26 +12,83 @@ const User = () => {
     const loggedInUser = JSON.parse(localStorage.getItem('user'))
 
     const handleChange = (e, storeId) => {
-        setRatings({ ...ratings, [storeId]: e.target.value });
+        const value = e.target.value;
+    if (value === '' || (value >= 1 && value <= 5)) {
+        setRatings(prev => ({ ...prev, [storeId]: value }));
+    }
     };
 
-    const handleSubmit = async (storeId) => {
-        const rating = ratings[storeId];
+    const handleKeyDown = (e) => {
+        if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown' && e.key !== 'Backspace' && e.key !== 'Delete') {
+            e.preventDefault();
+            alert('Please use arrow keys to change rating');
+        }
+    };
+
+    const handleSubmit = async (storeId,store) => {
+        const rating = ratings[storeId] || stores.map((store)=>store.ratings.filter((users)=>users.user.id == loggedInUser.id)[0].value );
         if (!rating || rating < 1 || rating > 5) {
             alert("Please enter a rating between 1 and 5");
             return;
         }
         console.log(`Submitted rating for store ${storeId}: ${rating}`);
-        // TODO: API call to submit rating
 
-       const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/store/rateTheStore/${storeId}`,{
-            score:rating
-        })
+        const existingRating = store.ratings.find(
+            (rating) => rating.user.id === loggedInUser.id
+        );
 
-        if(response.status === 201){
-            alert('rating submitted successfully')
-            setRatings(prev=>({...prev,[response.data.rating.storeId]:response.data.value}))
+        let response;
+        if (existingRating) {
+            // Update existing rating
+            response = await axios.put(
+                `${import.meta.env.VITE_BASE_URL}/store/modifyRating/${storeId}`,
+                {
+                    score: rating
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
+        } else {
+            // Create new rating
+            response = await axios.put(
+                `${import.meta.env.VITE_BASE_URL}/store/rateTheStore/${storeId}`,
+                {
+                    score: rating
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
         }
+
+        if (response.status === 201) {
+            // console.log('hiiiiiiiiiiiii')
+            alert(existingRating ? 'Rating updated successfully' : 'Rating submitted successfully');
+            setRatings(prev => ({...prev, [response.data.rating.storeId]: response.data.rating.value}));
+            // Refresh the stores list to get updated ratings
+            FetchStores();
+        }
+
+        
+
+    //     // API call to submit rating
+    //    const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/store/rateTheStore/${storeId}`,{
+    //         score:rating
+    //     },{
+    //         headers:{
+    //             Authorization:`Bearer ${localStorage.getItem('token')}`
+    //         }
+    //     })
+
+    //     if(response.status === 201){
+    //         alert('rating submitted successfully')
+    //         setRatings(prev=>({...prev,[response.data.rating.storeId]:response.data.rating.value}))
+    //     }
     };
 
     const FetchStores = async () =>{
@@ -47,7 +104,8 @@ const User = () => {
             })
 
             if(response.status === 201){
-                setStores(response.data.allStores)
+                setStores(response.data.allstores)
+                response.data.allstores
             } 
         } catch (error) {
             throw new Error('err in User-dashboard -', error);
@@ -110,17 +168,19 @@ const User = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {stores.map((store) => (
+                                {stores?.map((store) => (
                                     <tr key={store.id} className="border-t border-gray-300 hover:bg-gray-50">
-                                        <td className="px-4 py-2">{store.name}</td>
-                                        <td className="px-4 py-2">{store.address}</td>
-                                        <td className="px-4 py-2">{store.overallRating}</td>
+                                        <td className="px-4 py-2">{store?.name}</td>
+                                        <td className="px-4 py-2">{store?.address}</td>
+                                        <td className="px-4 py-2">{store?.overallRating}</td>
                                         <td className="px-4 py-2">
                                             <input
                                                 type="number"
                                                 min="1"
                                                 max="5"
-                                                value={ratings[store.id] || ""}
+                                                value={ratings[store.id] ||  (store.ratings.find(rating => rating.user.id === loggedInUser.id)?.value) || 
+                                                    ''}
+                                                    onKeyDown={handleKeyDown}
                                                 onChange={(e) => handleChange(e, store.id)}
                                                 className="border border-gray-300 rounded-md px-2 py-1 w-20"
                                                 placeholder="1-5"
@@ -128,10 +188,10 @@ const User = () => {
                                         </td>
                                         <td className="px-4 py-2">
                                             <button
-                                                onClick={() => handleSubmit(store.id)}
+                                                onClick={() => handleSubmit(store.id,store)}
                                                 className="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700"
                                             >
-                                               {ratings[store.id] ? 'update' : 'Submit'}
+                                               {ratings[store.id] || store.ratings.filter((users)=>users.user.id == loggedInUser.id)[0].value ? 'update' : 'Submit'}
                                             </button>
                                         </td>
                                     </tr>
@@ -146,3 +206,6 @@ const User = () => {
 }
 
 export default User
+
+
+// store.ratings.filter((users)=>users.user.id == loggedInUser.id)[0].value

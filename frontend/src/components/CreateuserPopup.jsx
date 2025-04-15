@@ -10,7 +10,7 @@ const CreateUser = ({setCreateBoxOpen}) => {
         name: "",
         email: "",
         password: "",
-        role: "",
+        role: "USER",
         address: ""
     });
     const [validationErrors,setValidationErrors] = useState({})
@@ -18,13 +18,17 @@ const CreateUser = ({setCreateBoxOpen}) => {
 
     // validate inputs
      const InputValidation = () =>{
+        setValidationErrors({})
+        const newErrors = {}
           
         if(data.name.length < 20 || data.name.length > 60 ){
             setValidationErrors((prev)=>({...prev,name:'name should min 20 & max 60 character'}))
+           newErrors['name'] = 'name should min 20 & max 60 character'
         }
           
             if(!emailRegex.test(data.email)){
                 setValidationErrors((prev)=>({...prev,email:'Enter Valid Email'}))
+                newErrors['email'] = 'Enter Valid Email'
             }
             if(!passwordRegex.test(data.password)){
                 setValidationErrors((prev)=>({...prev,password:`
@@ -32,10 +36,13 @@ const CreateUser = ({setCreateBoxOpen}) => {
                      At least one uppercase letter
                      At least one special character
                     `}))
+                    newErrors['password'] = '8–16 characters - At least one uppercase letter - At least one special character'
             }
             if(data.address.trim().length > 400){
-                setValidationErrors((prev)=>({...prev,address:`max 400 charaters`}))
+                setValidationErrors((prev)=>({...prev,address:`max 400 characters`}))
+                newErrors['address'] = 'max 400 characters'
             }
+            return Object.keys(newErrors).length === 0
         }
 
     const handleChange = (e) => {
@@ -46,8 +53,8 @@ const CreateUser = ({setCreateBoxOpen}) => {
         e.preventDefault();
         console.log("data:", data);
        
-        InputValidation()
-        if(validationErrors !== null) return
+       const isValid = InputValidation()
+        if(!isValid) return
 
         try {
              // API call 
@@ -132,7 +139,7 @@ const CreateUser = ({setCreateBoxOpen}) => {
                         </div>
 
                         <div>
-                            <select onChange={handleChange} name="role" id="" className="w-full border border-gray-950 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select onChange={handleChange} name="role" value={data.role} className="w-full border border-gray-950 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="USER">User</option>
                                 <option value="OWNER">Owner</option>
                                 <option value="ADMIN">Admin</option>
